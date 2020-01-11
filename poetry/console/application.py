@@ -5,6 +5,7 @@ from poetry.__version__ import __version__
 from .commands.about import AboutCommand
 from .commands.add import AddCommand
 from .commands.build import BuildCommand
+from .commands.bundle import BundleCommand
 from .commands.cache.cache import CacheCommand
 from .commands.check import CheckCommand
 from .commands.config import ConfigCommand
@@ -74,6 +75,9 @@ class Application(BaseApplication):
             UpdateCommand(),
             VersionCommand(),
         ]
+
+        # Bundle commands
+        commands += [BundleCommand()]
 
         # Cache commands
         commands += [CacheCommand()]
