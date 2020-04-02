@@ -29,6 +29,7 @@ from poetry.console.commands.command import Command
 from poetry.console.commands.env_command import EnvCommand
 from poetry.console.logging.io_formatter import IOFormatter
 from poetry.console.logging.io_handler import IOHandler
+from poetry.utils._compat import PY36
 
 
 class ApplicationConfig(BaseApplicationConfig):
@@ -45,6 +46,15 @@ class ApplicationConfig(BaseApplicationConfig):
 
         self.add_event_listener(PRE_HANDLE, self.register_command_loggers)
         self.add_event_listener(PRE_HANDLE, self.set_env)
+
+        if PY36:
+            from poetry.solution_providers import (
+                PythonRequirementIncompatibilitySolutionProvider,
+            )
+
+            self._solution_provider_repository.register_solution_providers(
+                [PythonRequirementIncompatibilitySolutionProvider]
+            )
 
     def register_command_loggers(
         self, event, event_name, _
