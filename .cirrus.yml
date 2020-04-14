@@ -19,6 +19,7 @@ test_task:
     - $PYTHON -m pip install pip -U
     - $PYTHON -m pip install poetry -U --pre
     - $PYTHON -m poetry config virtualenvs.in-project true
+    - $PYTHON -m poetry config --list
   deps_script: $PYTHON -m poetry install
   test_script: $PYTHON -m poetry run pytest -q --junitxml=junit.xml tests
   on_failure:
@@ -30,11 +31,13 @@ test_task:
 release_task:
   name: "Release / FreeBSD"
   only_if: $CIRRUS_TAG != ''
+  env:
+    GITHUB_TOKEN: ENCRYPTED[qwerty]
   freebsd_instance:
     matrix:
       - image_family: freebsd-12-1-snap
       - image_family: freebsd-11-3-snap
-  python_script: pkg install -y python3 python27 python35 python36 python37 python38
+  python_script: pkg install -y curl python3 python27 python35 python36 python37 python38
   pip_script:
     - python2.7 -m ensurepip
     - python3.5 -m ensurepip
@@ -42,5 +45,17 @@ release_task:
     - python3.7 -m ensurepip
     - python3.8 -m ensurepip
   build_script: ./make-nix-release.sh
+  upload_script: |
+    for fpath in releases/*
+    do
+      echo "Uploading $fpath..."
+      name=$(basename "$fpath")
+      url_to_upload="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$CIRRUS_TAG/assets?name=$name"
+      curl -X POST \
+        --data-binary @$fpath \
+        --header "Authorization: token $GITHUB_TOKEN" \
+        --header "Content-Type: application/octet-stream" \
+        $url_to_upload
+    done
   archive_artifacts:
     path: "releases/*"
