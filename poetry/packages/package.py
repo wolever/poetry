@@ -31,6 +31,7 @@ AUTHOR_REGEX = re.compile(r"(?u)^(?P<name>[- .,\w\d'’\"()]+)(?: <(?P<email>.+?
 logger = logging.getLogger(__name__)
 
 
+
 class Package(object):
 
     AVAILABLE_PYTHONS = {"2", "2.7", "3", "3.4", "3.5", "3.6", "3.7", "3.8"}
@@ -41,7 +42,6 @@ class Package(object):
         """
         self._pretty_name = name
         self._name = canonicalize_name(name)
-
         if not isinstance(version, Version):
             self._version = Version.parse(version)
             self._pretty_version = pretty_version or version
@@ -66,7 +66,7 @@ class Package(object):
         self.source_reference = ""
         self.source_url = ""
 
-        self.requires = []
+        self._requires = tuple()
         self.dev_requires = []
         self.extras = {}
         self.requires_extras = []
@@ -87,6 +87,14 @@ class Package(object):
         self.root_dir = None
 
         self.develop = True
+
+    @property
+    def requires(self):
+        return self._requires
+
+    @requires.setter
+    def requires(self, value):
+        self._requires = tuple(value)
 
     @property
     def name(self):
@@ -155,7 +163,7 @@ class Package(object):
 
     @property
     def all_requires(self):
-        return self.requires + self.dev_requires
+        return list(self.requires) + self.dev_requires
 
     def _get_author(self):  # type: () -> dict
         if not self._authors:
@@ -346,6 +354,7 @@ class Package(object):
                     category=category,
                     allows_prereleases=allows_prereleases,
                     source_name=constraint.get("source"),
+                    overrides=constraint.get("overrides"),
                 )
 
             if not markers:
@@ -383,7 +392,8 @@ class Package(object):
         if category == "dev":
             self.dev_requires.append(dependency)
         else:
-            self.requires.append(dependency)
+
+            self.add_requires(dependency)
 
         return dependency
 
@@ -419,12 +429,15 @@ class Package(object):
         clone.source_reference = self.source_reference
 
         for dep in self.requires:
-            clone.requires.append(dep)
+            clone.add_requires(dep)
 
         for dep in self.dev_requires:
             clone.dev_requires.append(dep)
 
         return clone
+
+    def add_requires(self, dep):
+        self._requires = self._requires + (dep, )
 
     def __hash__(self):
         return hash((self._name, self._version))

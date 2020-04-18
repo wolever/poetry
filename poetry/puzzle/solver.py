@@ -165,7 +165,7 @@ class Solver:
 
                         for dep in package.requires:
                             if dep not in pkg.requires:
-                                pkg.requires.append(dep)
+                                pkg.add_requires(dep)
 
         return packages, depths
 

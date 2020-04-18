@@ -176,7 +176,8 @@ class Provider:
                 for dep in package.extras[extra]:
                     dep.activate()
 
-                package.requires += package.extras[extra]
+                for e in package.extras[extra]:
+                    package.add_requires(e)
 
         return [package]
 
@@ -234,7 +235,8 @@ class Provider:
                 for dep in package.extras[extra]:
                     dep.activate()
 
-                package.requires += package.extras[extra]
+                for e in package.extras[extra]:
+                    package.add_requires(e)
 
         return [package]
 
@@ -260,7 +262,7 @@ class Provider:
                 package.extras[extra].append(dep)
 
             if not dep.is_optional():
-                package.requires.append(dep)
+                package.add_requires(dep)
 
         if info["requires_python"]:
             package.python_versions = info["requires_python"]
@@ -285,7 +287,8 @@ class Provider:
                 for dep in package.extras[extra]:
                     dep.activate()
 
-                package.requires += package.extras[extra]
+                for e in package.extras[extra]:
+                    package.add_requires(e)
 
         return [package]
 
@@ -310,7 +313,7 @@ class Provider:
 
             for dep in pkg.requires:
                 if not dep.is_optional():
-                    package.requires.append(dep)
+                    package.add_requires(dep)
 
             for extra, deps in pkg.extras.items():
                 if extra not in package.extras:
@@ -415,7 +418,7 @@ class Provider:
                         package.extras[extra].append(dep)
 
                 if not dep.is_optional():
-                    package.requires.append(dep)
+                    package.add_requires(dep)
 
             if python_requires:
                 package.python_versions = python_requires
@@ -449,7 +452,8 @@ class Provider:
                 for dep in package.extras[extra]:
                     dep.activate()
 
-                package.requires += package.extras[extra]
+                for e in package.extras[extra]:
+                    package.add_requires(e)
 
         return [package]
 
@@ -799,8 +803,9 @@ class Provider:
 
     @contextmanager
     def progress(self):
+        yield
+        return
         if not self._io.output.supports_ansi() or self.is_debugging():
-            self._io.write_line("Resolving dependencies...")
             yield
         else:
             indicator = Indicator(

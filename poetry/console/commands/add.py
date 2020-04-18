@@ -20,6 +20,13 @@ class AddCommand(EnvCommand, InitCommand):
             flag=False,
             multiple=True,
         ),
+        option(
+            "overrides",
+            "O",
+            "Overrides for this dependency",
+            flag=False,
+            multiple=True,
+        ),
         option("optional", None, "Add as an optional dependency."),
         option(
             "python",
@@ -116,6 +123,16 @@ If you do not specify a version constraint, poetry will choose a suitable one ba
                         extras.append(extra)
 
                 constraint["extras"] = self.option("extras")
+
+            if self.option("overrides"):
+                overrides = inline_table()
+                for override in self.option("overrides"):
+                    if "=" not in override:
+                        override += "=*"
+                    pkg, _, ver = override.partition("=")
+                    parse_constraint(ver.strip())
+                    overrides[pkg.strip()] = ver.strip()
+                constraint["overrides"] = overrides
 
             if self.option("python"):
                 constraint["python"] = self.option("python")

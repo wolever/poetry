@@ -27,6 +27,7 @@ class Dependency(object):
         category="main",  # type: str
         allows_prereleases=False,  # type: bool
         source_name=None,  # type: Optional[str]
+        overrides=None, # type: Optional[dict]
     ):
         self._name = canonicalize_name(name)
         self._pretty_name = name
@@ -50,6 +51,7 @@ class Dependency(object):
 
         self._allows_prereleases = allows_prereleases
         self._source_name = source_name
+        self.overrides = overrides or {}
 
         self._python_versions = "*"
         self._python_constraint = parse_constraint("*")

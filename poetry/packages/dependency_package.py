@@ -11,6 +11,17 @@ class DependencyPackage(object):
     def package(self):
         return self._package
 
+    @property
+    def requires(self):
+        res = self._package.requires
+        overrides = self.dependency.overrides
+        if overrides:
+            res = tuple(
+                dep.with_constraint(overrides.get(dep.name)) if dep.name in overrides else dep
+                for dep in res
+            )
+        return res
+
     def clone(self):  # type: () -> DependencyPackage
         return self.__class__(self._dependency, self._package.clone())
 

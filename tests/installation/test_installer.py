@@ -940,8 +940,8 @@ def test_run_update_with_locked_extras(installer, locker, repo, package):
     b_dependency.in_extras.append("foo")
     c_dependency = get_dependency("C", "^1.0")
     c_dependency.python_versions = "~2.7"
-    package_a.requires.append(b_dependency)
-    package_a.requires.append(c_dependency)
+    package_a.add_requires(b_dependency)
+    package_a.add_requires(c_dependency)
 
     repo.add_package(package_a)
     repo.add_package(get_package("B", "1.0"))

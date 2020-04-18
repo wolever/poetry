@@ -343,7 +343,7 @@ class LegacyRepository(PyPiRepository):
                         package.extras[extra].append(dependency)
 
                 if not dependency.is_optional():
-                    package.requires.append(dependency)
+                    package.add_requires(dependency)
 
             # Adding description
             package.description = release_info.get("summary", "")
@@ -357,7 +357,8 @@ class LegacyRepository(PyPiRepository):
                     for dep in package.extras[extra]:
                         dep.activate()
 
-                    package.requires += package.extras[extra]
+                    for e in package.extras[extra]:
+                        package.add_requires(e)
 
             self._packages.append(package)
 

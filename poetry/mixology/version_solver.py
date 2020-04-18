@@ -376,7 +376,6 @@ class VersionSolver:
             return dependency.name
 
         version = self._provider.complete_package(version)
-
         conflict = False
         for incompatibility in self._provider.incompatibilities_for(version):
             self._add_incompatibility(incompatibility)

@@ -135,7 +135,7 @@ def test_solver_with_deps(solver, repo, package):
     repo.add_package(package_b)
     repo.add_package(new_package_b)
 
-    package_a.requires.append(get_dependency("B", "<1.1"))
+    package_a.add_requires(get_dependency("B", "<1.1"))
 
     ops = solver.solve()
 
@@ -163,7 +163,7 @@ def test_install_honours_not_equal(solver, repo, package):
     repo.add_package(new_package_b12)
     repo.add_package(new_package_b13)
 
-    package_a.requires.append(get_dependency("B", "<=1.3,!=1.3,!=1.2"))
+    package_a.add_requires(get_dependency("B", "<=1.3,!=1.3,!=1.2"))
 
     ops = solver.solve()
 
@@ -188,10 +188,10 @@ def test_install_with_deps_in_order(solver, repo, package):
     repo.add_package(package_b)
     repo.add_package(package_c)
 
-    package_b.requires.append(get_dependency("A", ">=1.0"))
-    package_b.requires.append(get_dependency("C", ">=1.0"))
+    package_b.add_requires(get_dependency("A", ">=1.0"))
+    package_b.add_requires(get_dependency("C", ">=1.0"))
 
-    package_c.requires.append(get_dependency("A", ">=1.0"))
+    package_c.add_requires(get_dependency("A", ">=1.0"))
 
     ops = solver.solve()
 
@@ -410,7 +410,7 @@ def test_solver_returns_extras_if_requested(solver, repo, package):
     dep = get_dependency("C", "^1.0", optional=True)
     dep.marker = parse_marker("extra == 'foo'")
     package_b.extras = {"foo": [dep]}
-    package_b.requires.append(dep)
+    package_b.add_requires(dep)
 
     repo.add_package(package_a)
     repo.add_package(package_b)
@@ -1096,7 +1096,7 @@ def test_solver_sets_appropriate_markers_when_solving(solver, repo, package):
     package.add_dependency("A", "^1.0")
 
     package_a = get_package("A", "1.0.0")
-    package_a.requires.append(dep)
+    package_a.add_requires(dep)
 
     package_b = get_package("B", "1.0.0")
 
@@ -1133,8 +1133,8 @@ def test_solver_does_not_trigger_new_resolution_on_duplicate_dependencies_if_onl
 
     package_a = get_package("A", "1.0.0")
     package_a.extras = {"foo": [dep1], "bar": [dep2]}
-    package_a.requires.append(dep1)
-    package_a.requires.append(dep2)
+    package_a.add_requires(dep1)
+    package_a.add_requires(dep2)
 
     package_b2 = get_package("B", "2.0.0")
     package_b1 = get_package("B", "1.0.0")
@@ -1249,7 +1249,7 @@ def test_solver_ignores_dependencies_with_incompatible_python_full_version_marke
     package.add_dependency("B", "^2.0")
 
     package_a = get_package("A", "1.0.0")
-    package_a.requires.append(
+    package_a.add_requires(
         dependency_from_pep_508(
             'B (<2.0); platform_python_implementation == "PyPy" and python_full_version < "2.7.9"'
         )

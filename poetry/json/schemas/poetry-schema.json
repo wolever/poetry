@@ -269,6 +269,10 @@
                 "source": {
                     "type": "string",
                     "description": "The exclusive source used to search for this dependency."
+                },
+                "overrides": {
+                    "type": "object",
+                    "description": "Overrides for this package's dependencies"
                 }
             }
         },
